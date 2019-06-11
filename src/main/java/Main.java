@@ -48,7 +48,7 @@ public class Main {
                 ticketsViewer();
                 break;
             case "2":
-                showTicketbyID();
+                showTicketByID();
                 break;
             case "3":
                 break;
@@ -58,17 +58,21 @@ public class Main {
         }
     }
 
-    private void showTicketbyID() {
+    private void showTicketByID() {
         System.out.print("Enter the ticket ID: ");
         String id = getInput();
         Ticket response = viewTicket(id);
 
-        displayTicketDetails(response);
-
+        if (response != null) {
+            displayTicketDetails(response);
+            System.out.println("Press any key and enter to go back");
+            String backString = getInput();
+        }
+        else
+        return;
         /*System.out.println("Press Q to return");
         System.out.println("Enter Quit to exit the program");*/
-        System.out.println("Press any key and enter to go back");
-        String backString = getInput();
+
 
         /*if(backString == "Q") {
             return;
@@ -107,38 +111,45 @@ public class Main {
 
         while (true) {
             ZendeskPojo response = getTickets(pageNumber);
-            response.getTickets().forEach(ticket -> displayTicket(ticket));
-            System.out.println("\nPage Number: " + pageNumber + "/"
-                    + (response.getCount() / maxPageSize + (response.getCount() % maxPageSize == 0 ? 0 : 1)));
+            if (response != null) {
 
-            boolean paginationNeeded = response.getCount() > maxPageSize;
-            displayTicketsMenuAndGetResponse(paginationNeeded, response, pageNumber);
-            while (true) {
-                System.out.print("ENTER THE CHOICE: ");
-                chosenResponse = getInput();
-                List<String> validResponses = getTicketsMenuValidResponses(paginationNeeded, response, pageNumber);
-                if (validResponses.contains(chosenResponse))
-                    break;
-                else
-                    System.out.println("Invalid Input. Please Try again.");
-            }
 
-            switch (chosenResponse) {
-                case "N":
-                    pageNumber++;
-                    break;
-                case "P":
-                    pageNumber--;
-                    break;
-                case "Q":
-                    return;
-                case "V":
-                    showTicketbyID();
-                    break;
-                default:
-                    System.out.println("Please select from the above options.");
-                    break;
+                response.getTickets().forEach(ticket -> displayTicket(ticket));
+                System.out.println("\nPage Number: " + pageNumber + "/"
+                        + (response.getCount() / maxPageSize + (response.getCount() % maxPageSize == 0 ? 0 : 1)));
+
+                boolean paginationNeeded = response.getCount() > maxPageSize;
+                displayTicketsMenuAndGetResponse(paginationNeeded, response, pageNumber);
+                while (true) {
+                    System.out.print("ENTER THE CHOICE: ");
+                    chosenResponse = getInput();
+                    List<String> validResponses = getTicketsMenuValidResponses(paginationNeeded, response, pageNumber);
+                    if (validResponses.contains(chosenResponse))
+                        break;
+                    else
+                        System.out.println("Invalid Input. Please Try again.");
+                }
+
+
+                switch (chosenResponse) {
+                    case "N":
+                        pageNumber++;
+                        break;
+                    case "P":
+                        pageNumber--;
+                        break;
+                    case "Q":
+                        return;
+                    case "V":
+                        showTicketByID();
+                        break;
+                    default:
+                        System.out.println("Please select from the above options.");
+                        break;
+                }
             }
+        else
+            return;
         }
     }
 
@@ -208,7 +219,8 @@ public class Main {
                         .fromJson(EntityUtils.toString(response.getEntity()), ZendeskPojo.class);
             else
                 System.out.println("Oops! Couldn't connect. Please try again. Status Code: " + statusCode);
-            displayMainMenuAndGetResponse();
+            //throw new APIFailureException();
+
         } catch (Exception e) {
             throw new APIFailureException();
         }
@@ -232,7 +244,6 @@ public class Main {
                         .fromJson(EntityUtils.toString(response.getEntity()), TicketResponse.class).getTicket();
             else
                 System.out.println("Oops! Couldn't connect. Please try again. Status Code: " + statusCode);
-            displayMainMenuAndGetResponse();
         } catch (Exception e) {
             throw new APIFailureException();
         }
