@@ -11,11 +11,22 @@ Java
 
 <b>Running the program</b>
 
+Method 1:
+
 1. Install IntelliJ IDEA from https://www.jetbrains.com/idea/ or Any other Java IDE
 2. Clone or Download this project from the repository.
 3. Open the project using IntelliJ IDEA.
-4. Navigate to class ZendeskTicketViewer
-5. Run the main method.
+4. Navigate to class `ZendeskTicketViewer`
+5. Open or Run the main method.
+
+Method 2:
+
+1. Install java jdk/jre.
+2. Download the project from this repository.
+3. On Terminal change directory to `%ZendeskSupportTicketRetrievalCLI/out/artifacts/TicketViewerZendesk_jar`
+4. enter the command `java -jar TicketViewerZendesk.jar`
+
+
 
 <b>Assumptions and Decisions</b>
 
