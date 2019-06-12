@@ -90,17 +90,17 @@ public class ZendeskTicketViewerTest {
     }
 
 
-    /*@Test
+    @Test
     public void displayTicketReturnsValidTicket()
     {
-        Ticket ticket;
-        ticket = testZendeskTicketViewer.viewTicket("1");
-        String substringDisplayTicket = testZendeskTicketViewer.displayTicket(ticket);
+        Ticket ticket = testZendeskTicketViewer.viewTicket("1");
+        testZendeskTicketViewer.displayTicket(ticket);
+        //String substringDisplayTicket = testZendeskTicketViewer.displayTicket(ticket);
 
-        assertEquals("ID: 381581354133", testZendeskTicketViewer.displayTicket(ticket));
+        assertEquals("381581354133", testZendeskTicketViewer.testString);
 
 
-    }*/
+    }
 
 
 

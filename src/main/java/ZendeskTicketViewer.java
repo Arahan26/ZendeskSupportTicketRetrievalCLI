@@ -22,6 +22,7 @@ public class ZendeskTicketViewer {
 
     private int maxPageSize = 25;
     private Scanner scanner;
+    String testString = "";
 
     public static void main(String[] args) {
         new ZendeskTicketViewer().driver();
@@ -53,36 +54,6 @@ public class ZendeskTicketViewer {
                 System.out.println("Please select from the options.");
                 break;
         }
-    }
-
-    /**
-     * Asks for ticket ID whose details are to be displayed. If a valid ticket ID is given it displays the ticket details
-     */
-    private void showTicketByID() {
-        System.out.print("Enter the ticket ID: ");
-        String id = getInput();
-        Ticket response = viewTicket(id);
-
-        if (response != null) {
-            displayTicketDetails(response);
-            System.out.println("Press any key and enter to go back");
-            String backString = getInput();
-        }
-        else
-        return;
-
-    }
-
-    /**
-     * called by showTicketByID()  and displays details of a single ticket
-     * @param ticket the ticket id whose details are shown.
-     */
-    private void displayTicketDetails(Ticket ticket) {
-        System.out.println("Ticket ID: " + ticket.getId()
-                + "\tAssigned to: " + retrieveUsername(ticket.getAssigneeId()).getName()
-                + "\nSubject\t " + ticket.getSubject()
-                + "\n\nDescription:\t" + ticket.getDescription()
-                + "\n\nStatus:\t\t\t" + ticket.getStatus());
     }
 
     /**
@@ -132,18 +103,19 @@ public class ZendeskTicketViewer {
                         System.out.println("Please select from the above options.");
                         break;
                 }
-            }
-        else
-            return;
+            } else
+                return;
         }
     }
 
     /**
      * display's a single ticket's details.
      * (Optional) Retrieve's the name of the person the ticket is assigned to by retrieveUsername() method which in turn uses Zendesk's Users API
+     *
      * @param ticket
      */
     public void displayTicket(Ticket ticket) {
+        testString = ticket.getAssigneeId();
         System.out.println("ID: " + ticket.getId()
                 + " | Created At " + ticket.getCreatedAt()
                 + " | Subject: " + ticket.getSubject()
@@ -154,11 +126,45 @@ public class ZendeskTicketViewer {
                 + " | Priority:" + ticket.getPriority());
     }
 
+
+    /**
+     * Asks for ticket ID whose details are to be displayed. If a valid ticket ID is given it displays the ticket details
+     */
+    private void showTicketByID() {
+        System.out.print("Enter the ticket ID: ");
+        String id = getInput();
+        Ticket response = viewTicket(id);
+
+        if (response != null) {
+            displayTicketDetails(response);
+            System.out.println("Press any key and enter to go back");
+            String backString = getInput();
+        } else
+            return;
+
+    }
+
+    /**
+     * called by showTicketByID()  and displays details of a single ticket
+     *
+     * @param ticket the ticket id whose details are shown.
+     */
+    private void displayTicketDetails(Ticket ticket) {
+        System.out.println("Ticket ID: " + ticket.getId()
+                + "\tAssigned to: " + retrieveUsername(ticket.getAssigneeId()).getName()
+                + "\nSubject\t " + ticket.getSubject()
+                + "\n\nDescription:\t" + ticket.getDescription()
+                + "\n\nStatus:\t\t\t" + ticket.getStatus()
+                + "\nDue At:" + ticket.getDueAt());
+    }
+
+
     /**
      * displays the ticket menu. depending on the number of tickets, if more pages are there it adds or removes the option to navigate to them.
+     *
      * @param paginationNeeded boolean. checks if there are more than 25 tickets. if yes, adds pages to display them.
-     * @param response user input
-     * @param pageNumber the page you're on.
+     * @param response         user input
+     * @param pageNumber       the page you're on.
      */
     private void displayTicketsMenuAndGetResponse(boolean paginationNeeded, ZendeskPojo response, int pageNumber) {
         if (paginationNeeded) {
@@ -175,8 +181,9 @@ public class ZendeskTicketViewer {
 
     /**
      * dynamically decides if Next or Previous pages are available. If yes, shows the menu option for it.
+     *
      * @param paginationNeeded
-     * @param response has a property called next page. gives the link to that. I'm not using the link. Just changing the page number through code itself.
+     * @param response         has a property called next page. gives the link to that. I'm not using the link. Just changing the page number through code itself.
      * @param pageNumber
      * @return
      */
@@ -196,6 +203,7 @@ public class ZendeskTicketViewer {
 
     /**
      * scans and returns user input
+     *
      * @return
      */
     private String getInput() {
@@ -217,6 +225,7 @@ public class ZendeskTicketViewer {
 
     /**
      * accesses the tickets API and checks if the connection is made and valid. Returns the data in gson format.
+     *
      * @param page page number from which tickets are retrieved from.
      * @return
      */
@@ -247,6 +256,7 @@ public class ZendeskTicketViewer {
 
     /**
      * accesses the ticket API and returns a single ticket's details in gson format.
+     *
      * @param id id of the ticket to be shown.
      * @return
      */
@@ -266,6 +276,9 @@ public class ZendeskTicketViewer {
                 return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create()
                         .fromJson(EntityUtils.toString(response.getEntity()), TicketResponse.class).getTicket();
             else
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND)
+                    System.out.println("Oops! Invalid ID. Please try again.");
+                else
                 System.out.println("Oops! Couldn't connect. Please try again. Status Code: " + statusCode);
         } catch (Exception e) {
             throw new APIFailureException();
@@ -275,6 +288,7 @@ public class ZendeskTicketViewer {
 
     /**
      * accesses the Users API to retrieve details of a specific user.
+     *
      * @param id ID of the user whose details are needed.
      * @return
      */
